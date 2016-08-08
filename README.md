@@ -1,4 +1,4 @@
-#The Twitter express
+#The Twitter Express
 
 This project uses Node.js & Express (https://expressjs.com/) to provide a report of metrics based on the activity of Twitter's Streaming API statuses/sample endpoint (https://dev.twitter.com/streaming/reference/get/statuses/sample).
 
