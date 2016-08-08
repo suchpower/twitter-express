@@ -35,7 +35,7 @@ npm install
 ##Configure Twitter Authentication
 
 You'll need valid credentials from an active Twitter development app. Details about setting this up can be found here: https://apps.twitter.com/.
-Create a new app and then paste your access tokens into the config.js credentials object in your working directory, replacing the default string values.
+Create a new app and then paste your keys and secrets into the config.js credentials object in your working directory, replacing the default string values.
 
 ```
 ...
@@ -62,4 +62,4 @@ From your working directory, run
 node bin/www
 ```
 
-and watch the terminal report for periodic updates from the application!
+and watch the terminal for periodic updates from the application!
