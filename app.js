@@ -47,7 +47,13 @@ client.stream('statuses/sample', {}, function(stream) {
     // Uncomment the line below to
     //console.log(data);
     if (data['user'] !== undefined) {
-      var tweetEmojis = {},
+      var tweetHashtags = {},
+          tweetHashtagsLength = 0,
+          tweetUrls = {},
+          tweetUrlsLength = 0,
+          tweetMedia = {},
+          tweetMediaLength = 0,
+          tweetEmojis = {},
           tweetEmojisLength = 0,
           extractedDomain = '';
 
@@ -56,7 +62,14 @@ client.stream('statuses/sample', {}, function(stream) {
       // Append tweet object to master tweet object
       myTweets[data.id_str] = tweet;
 
-
+      tweetHashtags = myTweets[data.id_str]['hashtags'];
+      tweetHashtagsLength = myTweets[data.id_str]['hashtags'].length;
+      tweetUrls = myTweets[data.id_str]['urls'];
+      tweetUrlsLength = myTweets[data.id_str]['urls'].length;
+      tweetMedia = myTweets[data.id_str]['media'];
+      tweetMediaLength = myTweets[data.id_str]['media'].length;
+      tweetEmojis = appFunctions.parseEmojis(myTweets[data.id_str]['body'], emojiUnicodes);
+      tweetEmojisLength = appFunctions.getObjectLength(tweetEmojis);
 
       /*
       Sorry for the blocking here. An excellent package called
@@ -71,79 +84,90 @@ client.stream('statuses/sample', {}, function(stream) {
 
       Check this out, if you're interested: https://www.npmjs.com/package/async
       */
-
-      // Store Hashtags
-      if (myTweets[data.id_str]['hashtags'].length > 0) {
-        myNumHashtags += myTweets[data.id_str]['hashtags'].length;
-        for (var h = 0, hl = myTweets[data.id_str]['hashtags'].length; h < hl; h++) {
-          if (myHashtags.hasOwnProperty(myTweets[data.id_str]['hashtags'][h].text)) {
-            //increment counter on appropriate hashtag in myHashtags
-            myHashtags[myTweets[data.id_str]['hashtags'][h].text]++;
-          } else {
-            //add new hashtag info and counter set to 0
-            myHashtags[myTweets[data.id_str]['hashtags'][h].text] = 1;
+      setTimeout(function(tweetHashtags, tweetHashtagsLength) {
+        // Store Hashtags
+        //console.log(tweetHashtags);
+        //console.log(tweetHashtagsLength);
+        if (tweetHashtagsLength > 0) {
+          myNumHashtags += tweetHashtagsLength;
+          for (var h = 0, hl = tweetHashtagsLength; h < hl; h++) {
+            if (myHashtags.hasOwnProperty(tweetHashtags[h].text)) {
+              //increment counter on appropriate hashtag in myHashtags
+              myHashtags[tweetHashtags[h].text]++;
+            } else {
+              //add new hashtag info and counter set to 0
+              myHashtags[tweetHashtags[h].text] = 1;
+            }
           }
         }
-      }
+      }, 0, tweetHashtags, tweetHashtagsLength);
 
-      // Store Urls
-      if (myTweets[data.id_str]['urls'].length > 0) {
-        myNumUrls += myTweets[data.id_str]['urls'].length;
-        for (var u = 0, ul = myTweets[data.id_str]['urls'].length; u < ul; u++) {
-          // Save urls to url list
-          if (myUrls.hasOwnProperty(myTweets[data.id_str]['urls'][u].url)) {
-            //increment counter on appropriate url in myUrls
-            myUrls[myTweets[data.id_str]['urls'][u].url]++;
-          } else {
-            //add new url info and set counter to 1
-            myUrls[myTweets[data.id_str]['urls'][u].url] = 1;
-          }
+      setTimeout(function(tweetUrls, tweetUrlsLength) {
+        // Store Urls
+        if (tweetUrlsLength > 0) {
+          myNumUrls += tweetUrlsLength;
+          for (var u = 0; u < tweetUrlsLength; u++) {
+            // Save urls to url list
+            if (myUrls.hasOwnProperty(myTweets[data.id_str]['urls'][u].url)) {
+              //increment counter on appropriate url in myUrls
+              myUrls[tweetUrls[u].url]++;
+            } else {
+              //add new url info and set counter to 1
+              myUrls[tweetUrls[u].url] = 1;
+            }
 
-          // Save display_urls to domain list
-          extractedDomain = appFunctions.extractDomain(myTweets[data.id_str]['urls'][u].display_url);
-          if (myUrlDomains.hasOwnProperty(extractedDomain)) {
-            //increment counter on appropriate display_url in myUrlDomains
-            myUrlDomains[extractedDomain]++;
-          } else {
-            //add new display_url info and set counter to 1
-            myUrlDomains[extractedDomain] = 1;
-          }
-        }
-      }
-
-      // Store Photo Urls
-      if (myTweets[data.id_str]['media'].length > 0) {
-        for (var p = 0, pl = myTweets[data.id_str]['media'].length; p < pl; p++) {
-          var mediaUrl = myTweets[data.id_str]['media'][p].display_url;
-          var photoUrlTwitter = /pic.twitter.com/i;
-          var photoUrlInstagram = /instagram.com/i;
-          if (mediaUrl.match(photoUrlTwitter) || mediaUrl.match(photoUrlInstagram)) {
-            //increment photo url counter
-            myNumPhotoUrls++;
+            // Save display_urls to domain list
+            extractedDomain = appFunctions.extractDomain(tweetUrls[u].display_url);
+            if (myUrlDomains.hasOwnProperty(extractedDomain)) {
+              //increment counter on appropriate display_url in myUrlDomains
+              myUrlDomains[extractedDomain]++;
+            } else {
+              //add new display_url info and set counter to 1
+              myUrlDomains[extractedDomain] = 1;
+            }
           }
         }
-      }
+      }, 0, tweetUrls, tweetUrlsLength);
 
-      // Store Emojis
-      tweetEmojis = appFunctions.parseEmojis(myTweets[data.id_str]['body'], emojiUnicodes);
-      tweetEmojisLength = appFunctions.getObjectLength(tweetEmojis);
-      //console.log(tweetEmojis);
-      if (tweetEmojisLength > 0) {
-        myNumEmojis += tweetEmojisLength;
-        Object.keys(tweetEmojis).forEach(function(key) {
-          if (myEmojis.hasOwnProperty( punycode.ucs2.encode(['0x'+key]) )) {
-            //increment counter on appropriate emoji in myEmojis
-            myEmojis[ punycode.ucs2.encode(['0x'+key]) ].counter++;
-          } else {
-            //add new emoji info and set counter to 1
-            myEmojis[ punycode.ucs2.encode(['0x'+key]) ] = {
-              name: tweetEmojis[key].name,
-              shortName: tweetEmojis[key].shortName,
-              counter: 1
-            };
+      setTimeout(function(tweetMedia, tweetMediaLength) {
+        // Store Photo Urls
+        if (tweetMediaLength > 0) {
+          for (var p = 0; p < tweetMediaLength; p++) {
+            var mediaUrl = tweetMedia[p].display_url;
+            var photoUrlTwitter = /pic.twitter.com/i;
+            var photoUrlInstagram = /instagram.com/i;
+            if (mediaUrl.match(photoUrlTwitter) || mediaUrl.match(photoUrlInstagram)) {
+              //increment photo url counter
+              myNumPhotoUrls++;
+            }
           }
-        });
-      }
+        }
+      }, 0, tweetMedia, tweetMediaLength);
+
+      setTimeout(function(tweetEmojis, tweetEmojisLength) {
+        // Store Emojis
+        //console.log(tweetEmojis);
+        if (tweetEmojisLength > 0) {
+          myNumEmojis += tweetEmojisLength;
+          Object.keys(tweetEmojis).forEach(function(key) {
+            if (myEmojis.hasOwnProperty( punycode.ucs2.encode(['0x'+key]) )) {
+              //increment counter on appropriate emoji in myEmojis
+              myEmojis[ punycode.ucs2.encode(['0x'+key]) ].counter++;
+            } else {
+              //add new emoji info and set counter to 1
+              myEmojis[ punycode.ucs2.encode(['0x'+key]) ] = {
+                name: tweetEmojis[key].name,
+                shortName: tweetEmojis[key].shortName,
+                counter: 1
+              };
+            }
+          });
+        }
+      }, 0, tweetEmojis, tweetEmojisLength);
+
+
+
+
     }
   });
 
