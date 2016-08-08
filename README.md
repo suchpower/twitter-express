@@ -8,7 +8,7 @@ This project uses Node.js & Express (https://expressjs.com/) to provide a report
 * Average number of tweets per hour, minute, & second
 * Total number of URLs used in tweets, as well as the number of unique URLs encountered
 * Total number of emojis used in tweets, as well as the number of unique emojis encountered
-* Total number of hashtags used in tweets, as well as the number of unique hashtags encountered #blessed
+* Total number of hashtags used in tweets, as well as the number of unique hashtags encountered
 * Percent of tweets containing URLs
 * Percent of tweets containing Emojis
 * Percent of tweets containing Hashtags
