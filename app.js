@@ -24,7 +24,7 @@ var express = require('express'),
     processorStartTime = '';
 
 const punycode = require('punycode');
-var app = express();
+const app = express();
 var emojiUnicodes = appFunctions.extractEmojiUnicodes();
 var client = new Twitter(config.credentials);
 
